@@ -39,3 +39,6 @@ output/final-audit/*
 !output/human-qa-2026-10-28/
 output/human-qa-2026-10-28/*
 !output/human-qa-2026-10-28/REPORT.md
+!output/home-recommendations/
+output/home-recommendations/*
+!output/home-recommendations/QA_2026-10-28.md
