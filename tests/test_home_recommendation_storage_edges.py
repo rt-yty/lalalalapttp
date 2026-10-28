@@ -123,7 +123,7 @@ def test_duration_keeps_units_through_refinement_and_explicit_reset(edge_repo):
     assert '7 дней' in prompt and '7 ночей' not in prompt
     store.record_job(seed(repo,request='nights',text='Поеду на три ночи',when=NOW-timedelta(hours=1)),now=NOW)
     prompt=store.feed('one',{},now=NOW)['personalized'][0]['prompt']
-    assert '3 ночей' in prompt and '7 дней' not in prompt
+    assert '3 ноч' in prompt and '7 дней' not in prompt
     store.record_job(seed(repo,request='unknown',text='Длительность пока не знаю'),now=NOW)
     prompt=store.feed('one',{},now=NOW)['personalized'][0]['prompt']
-    assert '3 ночей' not in prompt and '7 дней' not in prompt
+    assert '3 ноч' not in prompt and '7 дней' not in prompt

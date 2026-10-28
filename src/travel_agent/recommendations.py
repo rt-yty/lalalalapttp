@@ -11,7 +11,7 @@ import math
 import re
 from typing import Any
 
-EXTRACTOR_VERSION = 2
+EXTRACTOR_VERSION = 3
 
 
 @dataclass(frozen=True)
@@ -250,11 +250,12 @@ def extract_signals(state: dict, user_text: str) -> list[dict]:
     active_artists = _positive_mentions(_clean(intake.get("event_name")), "artist") if intake.get("mode") in {"trip", "information"} else []
     cancelled = bool(re.search(r"\b(?:отмен\w*|передумал\w*)\b", text))
     event_mentioned = "theme:concerts" in mentioned
+    has_duration, duration, duration_unit = _explicit_duration(text)
     if "theme:concerts" in rejected:
         rejected.update(active_artists)
     # If an unknown/new artist is explicitly named, a stale previous intake is
     # not evidence that this is another request for that previous artist.
-    if not destinations and not artists and not cancelled and not any(CATALOG[key].kind in {"destination", "artist"} for key in rejected) and (_REFINEMENT.search(text) or origin_reply):
+    if not destinations and not artists and not cancelled and not any(CATALOG[key].kind in {"destination", "artist"} for key in rejected) and (_REFINEMENT.search(text) or origin_reply or has_duration):
         if not event_mentioned:
             topics.extend(key for key in active_destinations if key not in mentioned)
             topics.extend(key for key in active_artists if key not in mentioned and key not in rejected)
@@ -278,7 +279,6 @@ def extract_signals(state: dict, user_text: str) -> list[dict]:
             context["nightly_budget_minor" if nightly else "budget_minor"] = budget[0]
         if budget[1]:
             context["budget_scope"] = budget[1]
-    has_duration, duration, duration_unit = _explicit_duration(text)
     if has_duration:
         # None marks a reset; do not carry the other unit from an earlier turn.
         context["nights"] = duration if duration_unit == "nights" else None
@@ -311,7 +311,8 @@ def _prompt(topic, context, profile):
     elif topic.id == "theme:concerts":
         prompt = "Хочу спланировать поездку на концерт. Помоги выбрать исполнителя и сначала проверь будущие выступления, города и даты."
     else:
-        prompt = f"Помоги спланировать {('поездку в ' + topic.target) if topic.kind == 'destination' else topic.target}."
+        preposition = "на" if topic.id in {"destination:taiwan", "destination:indonesia", "destination:srilanka", "destination:altai"} else "в"
+        prompt = f"Помоги спланировать {('поездку ' + preposition + ' ' + topic.target) if topic.kind == 'destination' else topic.target}."
     origin = profile.get("origin") or context.get("origin")
     if isinstance(origin, str) and origin.strip():
         origin = origin.strip()[:150]
@@ -334,10 +335,10 @@ def _prompt(topic, context, profile):
     elif context.get("nights"):
         prompt += f" Длительность: {context['nights']} ночей; новые даты уточни у меня."
     if context.get("nightly_budget_minor"):
-        prompt += f" Лимит на проживание: {_rub(context['nightly_budget_minor'])} за ночь."
-        if context.get("budget_scope") == "per_person":
-            prompt += " Это лимит на человека."
-        elif context.get("budget_scope") != "trip":
+        scope = context.get("budget_scope")
+        prompt += f" Лимит на проживание: {_rub(context['nightly_budget_minor'])} за ночь"
+        prompt += " на человека." if scope == "per_person" else " на всех." if scope == "trip" else "."
+        if scope not in {"trip", "per_person"}:
             prompt += " Уточни, на всех или на человека указан лимит."
     elif context.get("budget_minor"):
         prompt += f" Бюджет: до {_rub(context['budget_minor'])}"

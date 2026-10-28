@@ -428,3 +428,29 @@ def test_short_departure_city_reply_updates_existing_trip_instead_of_creating_ne
 def test_short_new_destination_is_retained_when_snapshot_confirms_destination():
     rows = extract_signals({'request': {'destination': 'Казань', 'origin': 'Москва'}}, 'Казань')
     assert positive_ids(rows) == {'destination:kazan'}
+
+
+@pytest.mark.parametrize(('scope', 'words'), [('trip', 'на всех'), ('per_person', 'на человека')])
+async def test_nightly_draft_roundtrips_explicit_rate_scope(scope, words):
+    from travel_agent.interpretation import RuleBasedGateway, nightly_budget
+    result = feed([signal('theme:weekend', {'products': ['hotel'], 'nightly_budget_minor': 800000,
+                                           'budget_scope': scope, 'adults': 2})])
+    card = next(item for item in result['personalized'] if item['id'] == 'destination:kazan')
+    assert f'8 000 ₽ за ночь {words}.' in card['prompt']
+    assert nightly_budget(card['prompt']) == (800000, scope)
+    parsed = await RuleBasedGateway().interpret(card['prompt'], {}, NOW.isoformat(), 'Europe/Moscow')
+    assert parsed['patch']['budget_scope'] == scope
+
+
+def test_duration_only_refinement_updates_current_interest():
+    rows = extract_signals({'request': {'destination': 'Япония'}}, 'Поеду на три ночи')
+    assert positive_ids(rows) == {'destination:japan'}
+    assert rows[0]['context']['nights'] == 3
+    assert rows[0]['context']['duration_days'] is None
+
+
+def test_unknown_duration_only_refinement_resets_both_units():
+    rows = extract_signals({'request': {'destination': 'Япония'}}, 'Длительность пока не знаю')
+    assert positive_ids(rows) == {'destination:japan'}
+    assert rows[0]['context']['nights'] is None
+    assert rows[0]['context']['duration_days'] is None
