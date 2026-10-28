@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "description": "Очищенная, ограниченная выборка реально записанных ответов Туту от 26.10.2026; не текущее наличие.",
+  "request": {
+    "origin": "Москва",
+    "destination": "Ереван",
+    "departure_date": "2026-11-24",
+    "return_date": "2026-12-01",
+    "adults": 1,
+    "children_ages": []
+  },
+  "result": {
+    "flights": [
+      {
+        "snapshot_id": "b54c863ee45164766531cf68",
+        "provider": "tutu",
+        "product_type": "avia",
+        "title": "Аэрофлот · Эконом Базовый",
+        "price_minor": 2767800,
+        "currency": "RUB",
+        "data_origin": "recorded_fixture",
+        "source_recorded_at": "2026-10-26T19:22:22.205338+00:00",
+        "fetched_at": "2026-10-26T19:22:22.205338+00:00",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "conditions": {
+          "details_verified": true,
+          "baggage_kg": 0,
+          "baggage_pieces": 0,
+          "cabin_baggage_kg": 10,
+          "refundable": false,
+          "changeable": true,
+          "fare_family": "Эконом Базовый",
+          "pets": null,
+          "service_class": "ECONOMIC",
+          "price_basis": "party_round_trip_total",
+          "direct": true
+        },
+        "provider_refs": {
+          "reference_key": "flight-f043dcf4b5cc6cd6f25b72b6",
+          "flight_numbers": [
+            "SU-1860",
+            "SU-1867"
+          ],
+          "segments": [
+            {
+              "from": "Москва — Шереметьево (SVO), терм. C",
+              "to": "Ереван — Звартноц (EVN)",
+              "departure_at": "2026-11-24T11:35:00+03:00",
+              "arrival_at": "2026-11-24T16:20:00+04:00",
+              "voyage_no": "SU-1860",
+              "carrier": "Аэрофлот"
+            },
+            {
+              "from": "Ереван — Звартноц (EVN)",
+              "to": "Москва — Шереметьево (SVO), терм. C",
+              "departure_at": "2026-12-01T15:00:00+04:00",
+              "arrival_at": "2026-12-01T17:30:00+03:00",
+              "voyage_no": "SU-1867",
+              "carrier": "Аэрофлот"
+            }
+          ],
+          "fare_family": "Эконом Базовый"
+        },
+        "availability": "reported_available",
+        "evidence_refs": [
+          "archive:avia_selected_search.json#/offers/selected/variants/0"
+        ],
+        "expires_at": null,
+        "freshness": "historical",
+        "unknown_charges": [
+          "Дополнительные сборы, не раскрытые поставщиком"
+        ],
+        "departure_at": "2026-11-24T11:35:00+03:00",
+        "arrival_at": "2026-11-24T16:20:00+04:00",
+        "return_departure_at": "2026-12-01T15:00:00+04:00",
+        "return_arrival_at": "2026-12-01T17:30:00+03:00"
+      },
+      {
+        "snapshot_id": "fa665b6b63c6bd493df41007",
+        "provider": "tutu",
+        "product_type": "avia",
+        "title": "Аэрофлот · Эконом Оптимум",
+        "price_minor": 3521800,
+        "currency": "RUB",
+        "data_origin": "recorded_fixture",
+        "source_recorded_at": "2026-10-26T19:22:22.205338+00:00",
+        "fetched_at": "2026-10-26T19:22:22.205338+00:00",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "conditions": {
+          "details_verified": true,
+          "baggage_kg": 23,
+          "baggage_pieces": 1,
+          "cabin_baggage_kg": 10,
+          "refundable": true,
+          "changeable": true,
+          "fare_family": "Эконом Оптимум",
+          "pets": null,
+          "service_class": "ECONOMIC",
+          "price_basis": "party_round_trip_total",
+          "direct": true
+        },
+        "provider_refs": {
+          "reference_key": "flight-00fe531e009c12e0acca8b10",
+          "flight_numbers": [
+            "SU-1860",
+            "SU-1867"
+          ],
+          "segments": [
+            {
+              "from": "Москва — Шереметьево (SVO), терм. C",
+              "to": "Ереван — Звартноц (EVN)",
+              "departure_at": "2026-11-24T11:35:00+03:00",
+              "arrival_at": "2026-11-24T16:20:00+04:00",
+              "voyage_no": "SU-1860",
+              "carrier": "Аэрофлот"
+            },
+            {
+              "from": "Ереван — Звартноц (EVN)",
+              "to": "Москва — Шереметьево (SVO), терм. C",
+              "departure_at": "2026-12-01T15:00:00+04:00",
+              "arrival_at": "2026-12-01T17:30:00+03:00",
+              "voyage_no": "SU-1867",
+              "carrier": "Аэрофлот"
+            }
+          ],
+          "fare_family": "Эконом Оптимум"
+        },
+        "availability": "reported_available",
+        "evidence_refs": [
+          "archive:avia_selected_search.json#/offers/selected/variants/1"
+        ],
+        "expires_at": null,
+        "freshness": "historical",
+        "unknown_charges": [
+          "Дополнительные сборы, не раскрытые поставщиком"
+        ],
+        "departure_at": "2026-11-24T11:35:00+03:00",
+        "arrival_at": "2026-11-24T16:20:00+04:00",
+        "return_departure_at": "2026-12-01T15:00:00+04:00",
+        "return_arrival_at": "2026-12-01T17:30:00+03:00"
+      },
+      {
+        "snapshot_id": "c086b4ecad67cbb9abe73189",
+        "provider": "tutu",
+        "product_type": "avia",
+        "title": "Аэрофлот · Эконом Максимум",
+        "price_minor": 5026600,
+        "currency": "RUB",
+        "data_origin": "recorded_fixture",
+        "source_recorded_at": "2026-10-26T19:22:22.205338+00:00",
+        "fetched_at": "2026-10-26T19:22:22.205338+00:00",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "conditions": {
+          "details_verified": true,
+          "baggage_kg": 23,
+          "baggage_pieces": 2,
+          "cabin_baggage_kg": 10,
+          "refundable": true,
+          "changeable": true,
+          "fare_family": "Эконом Максимум",
+          "pets": null,
+          "service_class": "ECONOMIC",
+          "price_basis": "party_round_trip_total",
+          "direct": true
+        },
+        "provider_refs": {
+          "reference_key": "flight-06fdebed80cc7a666d2ab23e",
+          "flight_numbers": [
+            "SU-1860",
+            "SU-1867"
+          ],
+          "segments": [
+            {
+              "from": "Москва — Шереметьево (SVO), терм. C",
+              "to": "Ереван — Звартноц (EVN)",
+              "departure_at": "2026-11-24T11:35:00+03:00",
+              "arrival_at": "2026-11-24T16:20:00+04:00",
+              "voyage_no": "SU-1860",
+              "carrier": "Аэрофлот"
+            },
+            {
+              "from": "Ереван — Звартноц (EVN)",
+              "to": "Москва — Шереметьево (SVO), терм. C",
+              "departure_at": "2026-12-01T15:00:00+04:00",
+              "arrival_at": "2026-12-01T17:30:00+03:00",
+              "voyage_no": "SU-1867",
+              "carrier": "Аэрофлот"
+            }
+          ],
+          "fare_family": "Эконом Максимум"
+        },
+        "availability": "reported_available",
+        "evidence_refs": [
+          "archive:avia_selected_search.json#/offers/selected/variants/2"
+        ],
+        "expires_at": null,
+        "freshness": "historical",
+        "unknown_charges": [
+          "Дополнительные сборы, не раскрытые поставщиком"
+        ],
+        "departure_at": "2026-11-24T11:35:00+03:00",
+        "arrival_at": "2026-11-24T16:20:00+04:00",
+        "return_departure_at": "2026-12-01T15:00:00+04:00",
+        "return_arrival_at": "2026-12-01T17:30:00+03:00"
+      }
+    ],
+    "hotels": [
+      {
+        "snapshot_id": "d8f7cdd652bea20004bf8147",
+        "provider": "tutu",
+        "product_type": "hotel",
+        "title": "Median Hotel City Center Yerevan",
+        "price_minor": 3270200,
+        "currency": "RUB",
+        "data_origin": "recorded_fixture",
+        "source_recorded_at": "2026-10-26T19:21:29.431204+00:00",
+        "fetched_at": "2026-10-26T19:21:29.431204+00:00",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "conditions": {
+          "details_verified": true,
+          "breakfast": true,
+          "refundable": true,
+          "free_cancellation": true,
+          "free_cancellation_until": "2026-11-21T09:30:00Z",
+          "cancellation_policy": [
+            {
+              "start": null,
+              "end": "2026-11-21T09:30:00Z",
+              "penalty_minor": 0
+            },
+            {
+              "start": "2026-11-21T09:30:00Z",
+              "end": "2026-11-25T00:00:00Z",
+              "penalty_minor": 716924
+            },
+            {
+              "start": "2026-11-25T00:00:00Z",
+              "end": null,
+              "penalty_minor": 3270200
+            }
+          ],
+          "pets": false,
+          "room_name": "Одноместный номер Standard",
+          "bed_type": null,
+          "bed_summary": null,
+          "max_occupancy": null,
+          "check_in_time": "14:00:00",
+          "check_out_time": "12:00:00",
+          "rating": 9.3,
+          "stars": 4,
+          "meal": "Завтрак включён",
+          "price_basis": "stay_total",
+          "pay_at_hotel": null,
+          "pay_online": true,
+          "room_size_sqm": null
+        },
+        "provider_refs": {
+          "reference_key": "hotel-cef5c9bc5e8b1d4d26e50745",
+          "hotel_id": "7828769",
+          "room_name": "Одноместный номер Standard"
+        },
+        "availability": "reported_available",
+        "evidence_refs": [
+          "archive:hotels_median_full_2026-11-24.json#/rooms/0/rates/0"
+        ],
+        "expires_at": null,
+        "freshness": "historical",
+        "unknown_charges": [
+          "Дополнительные сборы, не раскрытые поставщиком"
+        ]
+      },
+      {
+        "snapshot_id": "4962ebd1ff2d37df77b08eb0",
+        "provider": "tutu",
+        "product_type": "hotel",
+        "title": "Отель Anga Yerevan Hotel",
+        "price_minor": 3822500,
+        "currency": "RUB",
+        "data_origin": "recorded_fixture",
+        "source_recorded_at": "2026-10-26T19:22:11.955489+00:00",
+        "fetched_at": "2026-10-26T19:22:11.955489+00:00",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "conditions": {
+          "details_verified": true,
+          "breakfast": true,
+          "refundable": true,
+          "free_cancellation": true,
+          "free_cancellation_until": "2026-11-16T16:00:00Z",
+          "cancellation_policy": [
+            {
+              "start": null,
+              "end": "2026-11-16T16:00:00Z",
+              "penalty_minor": 0
+            },
+            {
+              "start": "2026-11-16T16:00:00Z",
+              "end": null,
+              "penalty_minor": 3822500
+            }
+          ],
+          "pets": false,
+          "room_name": "Двухместный номер",
+          "bed_type": "double",
+          "bed_summary": "Двуспальная кровать ・ Тип кровати может измениться",
+          "max_occupancy": null,
+          "check_in_time": "14:00:00",
+          "check_out_time": "12:00:00",
+          "rating": 9,
+          "stars": 4,
+          "meal": "Завтрак включён",
+          "price_basis": "stay_total",
+          "pay_at_hotel": null,
+          "pay_online": true,
+          "room_size_sqm": null
+        },
+        "provider_refs": {
+          "reference_key": "hotel-1091f390beadeb83edb806ec",
+          "hotel_id": "7616392",
+          "room_name": "Двухместный номер"
+        },
+        "availability": "reported_available",
+        "evidence_refs": [
+          "archive:hotels_anga_full_2026-11-24.json#/rooms/0/rates/0"
+        ],
+        "expires_at": null,
+        "freshness": "historical",
+        "unknown_charges": [
+          "Дополнительные сборы, не раскрытые поставщиком"
+        ]
+      },
+      {
+        "snapshot_id": "a6a8f31ef1e11cfe5d04cf9b",
+        "provider": "tutu",
+        "product_type": "hotel",
+        "title": "Ani Grand Hotel",
+        "price_minor": 5469100,
+        "currency": "RUB",
+        "data_origin": "recorded_fixture",
+        "source_recorded_at": "2026-10-26T19:22:11.654362+00:00",
+        "fetched_at": "2026-10-26T19:22:11.654362+00:00",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "conditions": {
+          "details_verified": true,
+          "breakfast": true,
+          "refundable": true,
+          "free_cancellation": true,
+          "free_cancellation_until": "2026-11-23T10:00:00Z",
+          "cancellation_policy": [
+            {
+              "start": null,
+              "end": "2026-11-23T10:00:00Z",
+              "penalty_minor": 0
+            },
+            {
+              "start": "2026-11-23T10:00:00Z",
+              "end": "2026-11-24T00:00:00Z",
+              "penalty_minor": 1150300
+            },
+            {
+              "start": "2026-11-24T00:00:00Z",
+              "end": null,
+              "penalty_minor": 5469100
+            }
+          ],
+          "pets": false,
+          "room_name": "Двухместный номер Superior",
+          "bed_type": "double",
+          "bed_summary": "Двуспальная кровать ・ Тип кровати может измениться",
+          "max_occupancy": null,
+          "check_in_time": "14:00:00",
+          "check_out_time": "12:00:00",
+          "rating": 9.15,
+          "stars": 5,
+          "meal": "Завтрак включён",
+          "price_basis": "stay_total",
+          "pay_at_hotel": null,
+          "pay_online": true,
+          "room_size_sqm": null
+        },
+        "provider_refs": {
+          "reference_key": "hotel-6e78a62de605bf239bc44bea",
+          "hotel_id": "7829044",
+          "room_name": "Двухместный номер Superior"
+        },
+        "availability": "reported_available",
+        "evidence_refs": [
+          "archive:hotels_ani_grand_full_2026-11-24.json#/rooms/0/rates/0"
+        ],
+        "expires_at": null,
+        "freshness": "historical",
+        "unknown_charges": [
+          "Дополнительные сборы, не раскрытые поставщиком"
+        ]
+      }
+    ],
+    "coverage": [
+      {
+        "provider": "tutu",
+        "product": "avia",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "pages": [
+          1
+        ],
+        "count": 3,
+        "complete": false,
+        "stop_reason": "recorded_subset",
+        "source_filters": {
+          "direct_only": true,
+          "carriers": [
+            "Аэрофлот"
+          ],
+          "flight_numbers": [
+            "SU-1860",
+            "SU-1867"
+          ]
+        },
+        "note": "Три эконом-тарифа одного выбранного прямого рейса; не вся выдача."
+      },
+      {
+        "provider": "tutu",
+        "product": "hotel",
+        "query": {
+          "origin": "Москва",
+          "destination": "Ереван",
+          "departure_date": "2026-11-24",
+          "return_date": "2026-12-01",
+          "adults": 1,
+          "children_ages": []
+        },
+        "pages": [
+          1
+        ],
+        "count": 3,
+        "complete": false,
+        "stop_reason": "recorded_subset",
+        "note": "По одному конкретному подробному тарифу трёх исследованных отелей."
+      }
+    ],
+    "warnings": [
+      "Тест на архиве Туту от 26.10.2026. Цены и наличие исторические.",
+      "Изучена ограниченная подборка: один рейс в трёх тарифах и три отеля.",
+      "Трансфер, питание вне включённого завтрака, страховка и экскурсии не рассчитаны."
+    ],
+    "error": null
+  }
+}

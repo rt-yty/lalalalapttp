@@ -1,0 +1,1161 @@
+{
+  "tools": [
+    {
+      "name": "search_hotels",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "check_in": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Check-in date, YYYY-MM-DD. `checkin_date` is accepted as a backward-compatible alias.",
+            "title": "Check In"
+          },
+          "check_out": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Check-out date, YYYY-MM-DD. `checkout_date` is accepted as a backward-compatible alias. Must be after check_in.",
+            "title": "Check Out"
+          },
+          "checkin_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `check_in`.",
+            "title": "Checkin Date"
+          },
+          "checkout_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `check_out`.",
+            "title": "Checkout Date"
+          },
+          "city_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "City name (Russian; English/translit also accepted). Resolved via Tutu's hotel-specific, region-aware geo index: a resort name lands the whole zone (e.g. «Курорт Архыз» covering several посёлки), a city lands that city. `meta.resolved_geo` reports `geo_type` (region|locality), `hotels_count` and `also_geo` alternatives. PREFER this over passing `geo_id` directly. Mutually-optional with `geo_id`.",
+            "title": "City Name"
+          },
+          "geo_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Tutu hotel city geo_id (e.g. '2657260' for Moscow, '2656873' for Казань). Skip the city_name lookup if provided. WARNING: only pass an id obtained from a previous `search_hotels` response (`meta.geo_id` or `meta.resolved_geo.geo_id`). Do NOT reuse geo_ids from transport tools (`search_avia` / `search_rail` / `search_bus` / `search_etrain`) — for some cities those resolve to an AIRPORT/STATION entry that has zero hotels in Tutu's hotel catalog.",
+            "title": "Geo Id"
+          },
+          "adults": {
+            "default": 1,
+            "description": "Number of adult guests.",
+            "maximum": 6,
+            "minimum": 1,
+            "title": "Adults",
+            "type": "integer"
+          },
+          "children_ages": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Ages of accompanying children, e.g. [6, 12]. Empty/None = no children.",
+            "title": "Children Ages"
+          },
+          "page": {
+            "default": 1,
+            "description": "1-indexed page number.",
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "default": 10,
+            "description": "Hotels per page.",
+            "maximum": 30,
+            "minimum": 1,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "stars": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: include only these star ratings (1..5, plus 0 for unrated). Multi-select.",
+            "title": "Stars"
+          },
+          "price_max": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: maximum price PER NIGHT (RUB). Sent to the upstream as a relevance signal, then enforced server-side as a hard cap on `best_offer.price.amount / stay.nights` — the offer price is a whole-stay total, so it's divided back to per-night before the comparison.",
+            "title": "Price Max"
+          },
+          "meals": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: meal plans, e.g. ['breakfast', 'halfboard', 'allinclusive', 'fullboard', 'lunch', 'dinner', 'nomeal'].",
+            "title": "Meals"
+          },
+          "hotel_types": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "hotel",
+                    "apartments",
+                    "aparthotel",
+                    "minihotel",
+                    "hostel",
+                    "guesthouse",
+                    "bedandbreakfast",
+                    "room",
+                    "cottagesandhouses",
+                    "villasandbungalows",
+                    "boutiqueanddesign",
+                    "resort",
+                    "sanatorium",
+                    "glamping",
+                    "camping",
+                    "farm",
+                    "castle"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: property types, any of the listed (e.g. санаторий -> 'sanatorium', глэмпинг -> 'glamping').",
+            "title": "Hotel Types"
+          },
+          "min_rating": {
+            "anyOf": [
+              {
+                "maximum": 10,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: minimum aggregated rating (0..10). Mapped to the nearest Tutu rating bucket (>0 / >7 / >8 / >9).",
+            "title": "Min Rating"
+          },
+          "free_cancellation": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: keep only hotels offering free cancellation. Verify the cheapest rate with `best_offer.free_cancellation` per row.",
+            "title": "Free Cancellation"
+          },
+          "breakfast_included": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: keep only offers whose cheapest rate includes breakfast. Shortcut for `meals=['breakfast']`.",
+            "title": "Breakfast Included"
+          },
+          "hotel_amenities": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "pool",
+                    "swimming_pool",
+                    "pets",
+                    "pet_friendly",
+                    "parking",
+                    "beach",
+                    "kitchen",
+                    "wifi",
+                    "wi-fi",
+                    "spa",
+                    "transfer",
+                    "kids",
+                    "kid_friendly",
+                    "family_friendly",
+                    "aquapark",
+                    "buffet",
+                    "sauna",
+                    "jacuzzi",
+                    "shower",
+                    "banya",
+                    "elevator",
+                    "kids_pool",
+                    "hammam",
+                    "kids_club",
+                    "fridge",
+                    "billiards",
+                    "fitness",
+                    "gym",
+                    "minibar",
+                    "hairdryer",
+                    "smoking_allowed",
+                    "private_beach",
+                    "rooftop_pool",
+                    "beachfront",
+                    "accessible",
+                    "non_smoking",
+                    "adults_only",
+                    "honeymoon",
+                    "tv",
+                    "karaoke",
+                    "fishing",
+                    "winery",
+                    "skiing",
+                    "diving",
+                    "surfing",
+                    "volleyball",
+                    "live_music"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: property-level amenities, listed aliases only (not numeric ids). All must be present: ['pool', 'parking'] = pool AND parking.",
+            "title": "Hotel Amenities"
+          },
+          "room_amenities": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "private_bath",
+                    "private_bathroom",
+                    "workspace",
+                    "desk",
+                    "room_kitchen",
+                    "kitchenette",
+                    "room_wifi",
+                    "air_conditioner",
+                    "ac",
+                    "balcony",
+                    "sea_view",
+                    "water_view",
+                    "mountain_view",
+                    "view",
+                    "beautiful_view",
+                    "scenic_view",
+                    "kremlin_view"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter: room-level amenities, listed aliases only (not numeric ids). All must be present. Best-effort at the listing upstream — the response carries one `best_offer`, so use `get_offer_details` for guaranteed per-room filtering.",
+            "title": "Room Amenities"
+          },
+          "view": {
+            "default": "compact",
+            "description": "Response detail level: `compact` (default) or `full`. `compact` keeps one cover photo per hotel; `full` keeps a small gallery (a handful of photos, not every one — `photos_total` records the real count, the rest live on the hotel page). Room categories, rate ladders and review texts come from `get_offer_details` regardless of `view`. Prefer `compact` for first-pass search — `full` only swaps in more photos, which an agent rarely needs and which can overflow client output caps.",
+            "enum": [
+              "compact",
+              "full"
+            ],
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "title": "search_hotelsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_avia",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Origin city (e.g. 'Москва', 'Moscow', 'Сочи') or a specific airport by name/IATA code ('Внуково', 'VKO') — an airport narrows results to it. Resolved via Tutu suggest: short forms («Питер», «Мск») resolve server-side — `meta.from` then carries `match` + `query`, plus `also_named` when a same-name place lost. If the tool refuses with candidates (`could not resolve …`), ask the user or resend as '<name>, <область>' (name first). `from_city` is accepted as a backward-compatible alias.",
+            "title": "Origin"
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Destination city or a specific airport by name/IATA code ('Шереметьево', 'SVO') — an airport narrows results to it. Resolved via Tutu suggest: short forms («Питер», «Мск») resolve server-side — `meta.to` then carries `match` + `query`, plus `also_named` when a same-name place lost. If the tool refuses with candidates (`could not resolve …`), ask the user or resend as '<name>, <область>' (name first). `to_city` is accepted as a backward-compatible alias.",
+            "title": "Destination"
+          },
+          "departure_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Outbound departure date, YYYY-MM-DD.",
+            "title": "Departure Date"
+          },
+          "from_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `origin`.",
+            "title": "From City"
+          },
+          "to_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `destination`.",
+            "title": "To City"
+          },
+          "return_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional return date, YYYY-MM-DD. When set, the tool asks upstream for a round-trip package and returns offers with both legs (`legs[0]=outbound`, `legs[1]=return`). Crucial for long-haul international routes — some city pairs (e.g. Tokyo→Moscow far-future) are sold only as round-trip and return 0 offers as one-way.",
+            "title": "Return Date"
+          },
+          "adults": {
+            "default": 1,
+            "description": "Adult passengers (12+ years).",
+            "maximum": 9,
+            "minimum": 1,
+            "title": "Adults",
+            "type": "integer"
+          },
+          "children": {
+            "default": 0,
+            "description": "Children (2..11 years).",
+            "maximum": 9,
+            "minimum": 0,
+            "title": "Children",
+            "type": "integer"
+          },
+          "infants": {
+            "default": 0,
+            "description": "Infants (0..1 years).",
+            "maximum": 9,
+            "minimum": 0,
+            "title": "Infants",
+            "type": "integer"
+          },
+          "service_class": {
+            "default": "Y",
+            "description": "IATA service class: Y=economy, S=premium economy, C=business, F=first.",
+            "title": "Service Class",
+            "type": "string"
+          },
+          "page": {
+            "default": 1,
+            "description": "1-indexed page number. Each page carries up to `page_size` offers. Check `meta.has_more` to know if another page exists.",
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "default": 10,
+            "description": "Offers per page (1..30). Default 10.",
+            "maximum": 30,
+            "minimum": 1,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "sort": {
+            "default": "price_asc",
+            "description": "Ordering applied before pagination. `price_asc` (cheapest first), `price_desc`, `duration_asc` (shortest first), `departure_asc` (earliest departure).",
+            "enum": [
+              "price_asc",
+              "price_desc",
+              "duration_asc",
+              "departure_asc"
+            ],
+            "title": "Sort",
+            "type": "string"
+          },
+          "price_max": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Hard cap on price per offer (RUB). Enforced server-side.",
+            "title": "Price Max"
+          },
+          "direct_only": {
+            "default": false,
+            "description": "Keep only nonstop flights (every leg a single segment; correct for round-trip). Client-side post-filter; dropped count in `meta.post_filter_dropped_not_direct`.",
+            "title": "Direct Only",
+            "type": "boolean"
+          },
+          "carriers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Keep only offers by these airlines. Pass a `name` from `meta.carriers_available` (e.g. 'Аэрофлот'); an `id` also works when that entry carries one. Do NOT guess spelling: 'aeroflot' will not match 'Аэрофлот'. Case-insensitive substring on the display name; all carriers on a multi-carrier offer must match one of the requested values. An empty list is a no-op. Dropped count in `meta.post_filter_dropped_wrong_carrier`.",
+            "title": "Carriers"
+          },
+          "flight_numbers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Keep only offers containing one of these flights — THE way to answer «возьми рейс N»: one call instead of paging through the day. Accepts the full designator in any spelling ('SU-6176', 'SU 6176', 'su6176' — case, separators and leading zeros are normalized) or the bare flight digits ('6176', matched against every segment's number). ANY-segment match: a connection or round-trip containing the named flight keeps the WHOLE itinerary. Applied client-side to the full route pool (upstream has no flight-number filter); an empty list is a no-op. Dropped count in `meta.post_filter_dropped_wrong_flight_number`. An empty NUMBER-ONLY result means «этого рейса нет в продаже на Tutu на эту дату» — the flight may still operate (sold out or not sold here); never turn it into a timetable claim. That reading itself holds only while `meta.total_matched_exact` is true — on a rare capped route (`false`) the filter saw a truncated pool and the check is inconclusive. Combined with other filters it proves even less — the flight may be dropped by price/carrier/direct/airport scope (see their `meta.post_filter_dropped_*` counters); re-run number-only before concluding.",
+            "title": "Flight Numbers"
+          },
+          "view": {
+            "default": "compact",
+            "description": "Response detail level: `compact` (default) or `full`. `compact` returns lean decision cards — rail collapses the long per-class fare list to a `fares` summary {count, price_from, price_to, currency, refundable_count?, changeable_count?, refundable_unknown?, changeable_unknown?} (the full per-class breakdown and car classes come from `get_offer_details`; per-variant `conditions: {refundable, changeable}` come with `view='full'`), and rail/bus drop the per-segment rating that duplicates the offer-level one. Avia and etrain are left unchanged — neither has a read-only detail endpoint to recover dropped fares/ratings from. `full` inlines every fare variant and per-segment review_summary. Prefer `compact` for first-pass search; pass `full` only when the user needs the whole fare breakdown inline for several offers at once.",
+            "enum": [
+              "compact",
+              "full"
+            ],
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "title": "search_aviaArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_rail",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Origin city or station name (a station resolves when Tutu's index returns the station row, e.g. «Ярославский вокзал»; otherwise city-level). Resolved via Tutu suggest: short forms («Питер», «Мск») resolve server-side — `meta.from` then carries `match` + `query`, plus `also_named` when a same-name place lost. If the tool refuses with candidates (`could not resolve …`), ask the user or resend as '<name>, <область>' (name first). `from_city` is accepted as a backward-compatible alias.",
+            "title": "Origin"
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Destination city or station name (a station resolves when Tutu's index returns the station row, e.g. «Ярославский вокзал»; otherwise city-level). Resolved via Tutu suggest: short forms («Питер», «Мск») resolve server-side — `meta.to` then carries `match` + `query`, plus `also_named` when a same-name place lost. If the tool refuses with candidates (`could not resolve …`), ask the user or resend as '<name>, <область>' (name first). `to_city` is accepted as a backward-compatible alias.",
+            "title": "Destination"
+          },
+          "departure_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Departure date, YYYY-MM-DD.",
+            "title": "Departure Date"
+          },
+          "from_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `origin`.",
+            "title": "From City"
+          },
+          "to_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `destination`.",
+            "title": "To City"
+          },
+          "passengers": {
+            "default": 1,
+            "description": "Number of adult passengers. It does NOT change the fares upstream returns — a rail price is one seat either way (verified live: identical prices at 1, 2 and 3 passengers). What it does: sizes `price_party` on each offer, keeps transfer plans that can actually seat the party, and travels into `meta.pricing` + per-leg `search_rail_args`. Pass the real party anyway — the totals the agent quotes depend on it.",
+            "maximum": 6,
+            "minimum": 1,
+            "title": "Passengers",
+            "type": "integer"
+          },
+          "page": {
+            "default": 1,
+            "description": "1-indexed page number.",
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "default": 10,
+            "description": "Offers per page.",
+            "maximum": 30,
+            "minimum": 1,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "sort": {
+            "default": "price_asc",
+            "description": "Ordering applied before pagination.",
+            "enum": [
+              "price_asc",
+              "price_desc",
+              "duration_asc",
+              "departure_asc"
+            ],
+            "title": "Sort",
+            "type": "string"
+          },
+          "price_max": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Hard cap on price per offer (RUB). Enforced server-side.",
+            "title": "Price Max"
+          },
+          "direct_only": {
+            "default": false,
+            "description": "Keep only direct trains (no transfers — every leg a single segment). Dropped count in `meta.post_filter_dropped_not_direct`.",
+            "title": "Direct Only",
+            "type": "boolean"
+          },
+          "carriers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Keep only offers by these carriers (e.g. 'ФПК'). Pass a `name` from `meta.carriers_available` (the operators present in this result set); case-insensitive substring, an empty list is a no-op. All carriers on a multi-carrier offer must match one of the requested values. Dropped count in `meta.post_filter_dropped_wrong_carrier`.",
+            "title": "Carriers"
+          },
+          "train_numbers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Keep only offers carrying one of these train numbers (e.g. '750У') — THE way to answer «возьми поезд N»: one call instead of paging through the whole day. Matches every segment's bookable number AND its display form (a through train answers to both «135С» and «136*С»), ignoring case, spaces, '*', leading zeros and Latin/Cyrillic lookalike letters ('750Y' finds 750У). Applied to the full day's result set (upstream has no train-number filter, so the narrowing is ours); an empty list is a no-op. Dropped count in `meta.post_filter_dropped_wrong_train_number`. An empty NUMBER-ONLY result means «билетов на этот поезд в продаже нет» — NOT that the train does not run: the search covers bookable trains only, so a sold-out train is absent too. Combined with other filters it proves even less — the train may be dropped by price/category/carrier (see their `meta.post_filter_dropped_*` counters); re-run number-only before concluding. The conclusion also covers DIRECT trains only — the transfer block (`meta.interchange_routes`) is nondeterministic upstream, so its absence never proves the train is not a leg of a valid transfer. And without the filter, a train missing from the current PAGE proves nothing while `meta.has_more` is true.",
+            "title": "Train Numbers"
+          },
+          "seat_categories": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Keep only trains selling at least one fare in these car categories: 'SEDENTARY' (сидячий), 'RESERVED_SEAT' (плацкарт), 'COMPARTMENT' (купе), 'LUX' (СВ), 'SOFT' (мягкий), 'SHARED' (общий). Case-insensitive; any other value is REJECTED with an error (so a typo can never masquerade as «нет таких поездов»); an empty list is a no-op. Use it for «нужна сидячка» instead of paging and reading `fares.seat_categories` by hand. NB it NARROWS each offer to those fares: `price`, `fares` and the sort/`price_max` cap then describe the requested categories only, so don't read the result as «this train has no other cars» — re-run without the filter for the full ladder. Dropped count in `meta.post_filter_dropped_wrong_seat_category`. `meta.post_filter_unverified_seat_category` counts trains holding a fare upstream left unclassified — counted over the whole pool, before the price cap and the page cut, so never report an empty or thin filtered page as «нет таких поездов» while it is non-zero.",
+            "title": "Seat Categories"
+          },
+          "view": {
+            "default": "compact",
+            "description": "Response detail level: `compact` (default) or `full`. `compact` returns lean decision cards — rail collapses the long per-class fare list to a `fares` summary {count, price_from, price_to, currency, refundable_count?, changeable_count?, refundable_unknown?, changeable_unknown?} (the full per-class breakdown and car classes come from `get_offer_details`; per-variant `conditions: {refundable, changeable}` come with `view='full'`), and rail/bus drop the per-segment rating that duplicates the offer-level one. Avia and etrain are left unchanged — neither has a read-only detail endpoint to recover dropped fares/ratings from. `full` inlines every fare variant and per-segment review_summary. Prefer `compact` for first-pass search; pass `full` only when the user needs the whole fare breakdown inline for several offers at once.",
+            "enum": [
+              "compact",
+              "full"
+            ],
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "title": "search_railArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_bus",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Origin city. Resolved via Tutu suggest: short forms («Питер», «Мск») resolve server-side — `meta.from` then carries `match` + `query`, plus `also_named` when a same-name place lost. If the tool refuses with candidates (`could not resolve …`), ask the user or resend as '<name>, <область>' (name first). `from_city` is accepted as a backward-compatible alias.",
+            "title": "Origin"
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Destination city. Resolved via Tutu suggest: short forms («Питер», «Мск») resolve server-side — `meta.to` then carries `match` + `query`, plus `also_named` when a same-name place lost. If the tool refuses with candidates (`could not resolve …`), ask the user or resend as '<name>, <область>' (name first). `to_city` is accepted as a backward-compatible alias.",
+            "title": "Destination"
+          },
+          "departure_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Departure date, YYYY-MM-DD. Use the exact `departure_date` key; `date` is not an accepted alias.",
+            "title": "Departure Date"
+          },
+          "from_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `origin`.",
+            "title": "From City"
+          },
+          "to_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Deprecated alias for `destination`.",
+            "title": "To City"
+          },
+          "adults": {
+            "default": 1,
+            "description": "Number of adult passengers.",
+            "maximum": 8,
+            "minimum": 1,
+            "title": "Adults",
+            "type": "integer"
+          },
+          "children": {
+            "default": 0,
+            "description": "Number of children travelling on a child fare (each occupies a seat; the age limit and any discount are carrier-specific — never promise a discount the price doesn't show). Offer prices cover the WHOLE searched party (adults + children), max 8 seats total.",
+            "maximum": 7,
+            "minimum": 0,
+            "title": "Children",
+            "type": "integer"
+          },
+          "page": {
+            "default": 1,
+            "description": "1-indexed page number.",
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "default": 10,
+            "description": "Offers per page.",
+            "maximum": 30,
+            "minimum": 1,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "sort": {
+            "default": "price_asc",
+            "description": "Ordering applied before pagination.",
+            "enum": [
+              "price_asc",
+              "price_desc",
+              "duration_asc",
+              "departure_asc"
+            ],
+            "title": "Sort",
+            "type": "string"
+          },
+          "price_max": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Hard cap on price per offer (RUB). Enforced server-side.",
+            "title": "Price Max"
+          },
+          "direct_only": {
+            "default": false,
+            "description": "Keep only direct buses (no transfers — every leg a single segment). Dropped count in `meta.post_filter_dropped_not_direct`.",
+            "title": "Direct Only",
+            "type": "boolean"
+          },
+          "carriers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Keep only offers by these carriers (e.g. 'Ecolines'). Pass a `name` from `meta.carriers_available` (the operators present in this result set); case-insensitive substring, an empty list is a no-op. All carriers on a multi-carrier offer must match one of the requested values. Dropped count in `meta.post_filter_dropped_wrong_carrier`.",
+            "title": "Carriers"
+          },
+          "view": {
+            "default": "compact",
+            "description": "Response detail level: `compact` (default) or `full`. `compact` returns lean decision cards — rail collapses the long per-class fare list to a `fares` summary {count, price_from, price_to, currency, refundable_count?, changeable_count?, refundable_unknown?, changeable_unknown?} (the full per-class breakdown and car classes come from `get_offer_details`; per-variant `conditions: {refundable, changeable}` come with `view='full'`), and rail/bus drop the per-segment rating that duplicates the offer-level one. Avia and etrain are left unchanged — neither has a read-only detail endpoint to recover dropped fares/ratings from. `full` inlines every fare variant and per-segment review_summary. Prefer `compact` for first-pass search; pass `full` only when the user needs the whole fare breakdown inline for several offers at once.",
+            "enum": [
+              "compact",
+              "full"
+            ],
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "title": "search_busArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_offer_details",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "product_type": {
+            "description": "Type of offer to inspect. Only `hotels` has text reviews; rail/bus have read-only detail endpoints.",
+            "enum": [
+              "hotels",
+              "avia",
+              "rail",
+              "railway",
+              "bus",
+              "etrain"
+            ],
+            "title": "Product Type",
+            "type": "string"
+          },
+          "offer_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "REQUIRED for `hotels` (or its aliases `hotel_id` / `hotel_geo_id` — same value, pass any ONE): Tutu hotel id, i.e. the `hotel_id` / `hotel_geo_id` field of the search_hotels row you are detailing, the numeric id used in details URLs; `tutu_offer_id` UUID is not accepted by Tutu details endpoints. Optional for transport — `details_ref` alone is enough.",
+            "title": "Offer Id"
+          },
+          "hotel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Alias for `offer_id`, named as `search_hotels` returns it. Pass one of the three, not several.",
+            "title": "Hotel Id"
+          },
+          "hotel_geo_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Alias for `offer_id`, named as `search_hotels` and `create_checkout_link` spell it.",
+            "title": "Hotel Geo Id"
+          },
+          "details_ref": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "For `rail` and `bus`: pass `offer.details_ref` from the corresponding search result verbatim. For `avia`/`etrain`: pass the selected compact offer object if you want a presentation-ready reformat without side effects.",
+            "title": "Details Ref"
+          },
+          "check_in": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Required for `hotels`. YYYY-MM-DD.",
+            "title": "Check In"
+          },
+          "check_out": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Required for `hotels`. YYYY-MM-DD.",
+            "title": "Check Out"
+          },
+          "adults": {
+            "default": 2,
+            "description": "Number of adult guests.",
+            "maximum": 6,
+            "minimum": 1,
+            "title": "Adults",
+            "type": "integer"
+          },
+          "children_ages": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Ages of accompanying children.",
+            "title": "Children Ages"
+          },
+          "review_limit": {
+            "default": 5,
+            "description": "For `hotels`: number of review texts to return in `view='reviews'` / `view='full'`. Default 5, max 50; page with `review_offset`. Ignored by `compact`/`rules` — those views carry only `review_summary` and skip the review fetch entirely.",
+            "maximum": 50,
+            "minimum": 0,
+            "title": "Review Limit",
+            "type": "integer"
+          },
+          "review_offset": {
+            "default": 0,
+            "description": "For `hotels`: review pagination offset. Use `hotel.reviews.pagination.has_more` to fetch next page.",
+            "minimum": 0,
+            "title": "Review Offset",
+            "type": "integer"
+          },
+          "review_sort": {
+            "default": "postedAt",
+            "description": "For `hotels`: sort review texts by date or rating.",
+            "enum": [
+              "postedAt",
+              "rating"
+            ],
+            "title": "Review Sort",
+            "type": "string"
+          },
+          "review_order": {
+            "default": "desc",
+            "description": "For `hotels`: review sort order.",
+            "enum": [
+              "desc",
+              "asc"
+            ],
+            "title": "Review Order",
+            "type": "string"
+          },
+          "review_topics": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "For `hotels`: optional topic filter from `hotel.reviews.topics`. Empty/None = all topics.",
+            "title": "Review Topics"
+          },
+          "view": {
+            "default": "compact",
+            "description": "Response detail level. Hotel detail scope: `compact` (default) / `rules` / `reviews` / `full`. `compact` is the lean decision card: room photos capped, per-rate `cancellation_policy` text dropped (the decision facts stay in `free_cancellation` + `free_cancellation_until`), room `amenity_groups` dropped (flat `room_amenities` kept), hotel photos capped, hotel `amenity_groups` slimmed to names, and review TEXTS omitted — the `review_summary` aggregate (rating + aspects) stays; for guest quotes call `view='reviews'`. `rules` = compact + the full cancellation ladder. `reviews` is a feedback-only card: hotel identity + `review_summary` + `reviews[]` texts (set `review_limit`), rooms collapse to name + cheapest-price stubs, no photos/amenities/policy. `full` returns every block (photo arrays still bounded to a small gallery). Transport details ignore `view`.",
+            "enum": [
+              "compact",
+              "rules",
+              "reviews",
+              "full"
+            ],
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_type"
+        ],
+        "title": "get_offer_detailsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_avia_instructions",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "_get_instructionsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_rail_instructions",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "_get_instructionsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_bus_instructions",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "_get_instructionsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_hotels_instructions",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "_get_instructionsArguments",
+        "type": "object"
+      }
+    }
+  ]
+}

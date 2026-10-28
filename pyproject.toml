@@ -1,0 +1,90 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ostrovok-travel-agent"
+version = "0.1.0"
+description = "О!дин запрос: проверяемый прототип агента путешествий"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.10,<3",
+  "langgraph>=1.0,<2",
+  "langchain-core>=1.0,<2",
+  "langchain-huggingface>=1.0,<2",
+  "httpx>=0.28,<1",
+  "jsonschema>=4.23,<5",
+  "PyYAML>=6,<7",
+  "python-dotenv>=1,<2",
+  "langgraph-checkpoint-sqlite>=3,<4",
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.30,<1",
+  "psycopg[binary]>=3.2,<4",
+  "email-validator>=2.2,<3",
+]
+
+[project.scripts]
+travel-agent = "travel_agent.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "pytest-asyncio>=1,<2"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/travel_agent"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"frontend/dist" = "travel_agent/web_dist"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/travel_agent",
+  "tests",
+  "examples",
+  "pyproject.toml",
+  "uv.lock",
+  "README.md",
+  ".env.example",
+  "Запустить агента.command",
+  "Открыть интерфейс.command",
+  "Настроить Яндекс.command",
+  "Запустить проект.command",
+  "frontend/src",
+  "frontend/e2e",
+  "frontend/e2e-real",
+  "frontend/public",
+  "frontend/index.html",
+  "frontend/package.json",
+  "frontend/package-lock.json",
+  "frontend/tsconfig.json",
+  "frontend/vite.config.ts",
+  "frontend/vitest.config.ts",
+  "frontend/playwright.config.ts",
+  "frontend/playwright.real.config.ts",
+  "frontend/QA.md",
+  "scripts",
+  "Dockerfile",
+  "compose.yaml",
+  ".dockerignore",
+  "BACKEND_DEPLOYMENT.md",
+  "AUTH.md",
+  "AGENT_BACKEND_CONTRACT.md",
+  "AGENT_SPEC.md",
+  "AGENT_TOOLS.md",
+  "AGENT_IMPLEMENTATION_PLAN.md",
+  "CONTEXT.md",
+  "VERIFICATION.md",
+  "RESEARCH_COMPETITORS.md",
+  "RELEASE_REPORT.md",
+  "CORRECTIONS_REPORT.md",
+  "output/final-audit/AGENT_QUALITY_REPORT.md",
+  "output/final-audit/CONCERT_RESEARCH_REPORT.md",
+  "output/final-audit/CONCERT_INTAKE_REPORT.md",
+]
+exclude = ["/exports", "/context_sources", "/data", "/.env"]
+
+[tool.hatch.build.targets.sdist.force-include]
+"frontend/dist" = "frontend/dist"

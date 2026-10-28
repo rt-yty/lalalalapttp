@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#164d48">
+  <meta name="description" content="Один запрос — и ваша поездка собирается в понятный план. Локальный прототип агента путешествий.">
+  <title>О!дин запрос · Ваша поездка</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="О!дин запрос — главная">
+        <span class="brand-mark" aria-hidden="true">о!</span>
+        <span class="brand-name">О!дин запрос<span class="brand-caption">Ваш помощник в путешествиях</span></span>
+      </a>
+      <div class="header-actions">
+        <span class="mode-badge"><span class="tiny-dot"></span> Прототип <span class="badge-divider">/</span> <span id="data-label">архивные данные</span></span>
+        <button id="new-trip" class="button button-quiet" type="button" disabled><span aria-hidden="true">＋</span> Новая поездка</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-heading" aria-labelledby="page-title">
+        <div><p class="eyebrow">МЕНЬШЕ ПОИСКА. БОЛЬШЕ ПУТЕШЕСТВИЙ.</p><h1 id="page-title">Расскажите о поездке.<br class="mobile-break"> Остальное соберём вместе.</h1></div>
+        <div class="journey-steps" aria-label="Этапы поездки">
+          <span class="step is-current" data-step="1"><span>01</span> Ваши пожелания</span>
+          <span class="step-line" aria-hidden="true"></span>
+          <span class="step" data-step="2"><span>02</span> Подбор</span>
+          <span class="step-line" aria-hidden="true"></span>
+          <span class="step" data-step="3"><span>03</span> Готовый план</span>
+        </div>
+      </section>
+
+      <div id="connection-error" class="connection-error" role="alert" hidden><span id="error-text"></span><button id="retry" class="button button-small" type="button">Повторить</button></div>
+
+      <div id="mode-notice" class="mode-notice" role="status" hidden></div>
+
+      <div class="workspace">
+        <section class="chat-panel panel" aria-labelledby="chat-title">
+          <div class="panel-heading"><div class="agent-ident"><span class="agent-avatar" aria-hidden="true">✦</span><div><h2 id="chat-title">Соберём вашу поездку</h2><p id="agent-status"><span class="status-dot"></span> Подключаемся…</p></div></div><span class="private-note"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 8V6a4.5 4.5 0 0 1 9 0v2M4 8.5h12v9H4z"/><path d="M10 12v2"/></svg> Локально</span></div>
+          <div id="chat-scroll" class="chat-scroll">
+            <div id="welcome" class="welcome">
+              <span class="welcome-spark" aria-hidden="true">✦</span>
+              <h3>Хорошая поездка<br>начинается с разговора</h3>
+              <p>Куда хочется, с кем поедете и сколько готовы потратить? Напишите своими словами — уточним детали по ходу.</p>
+              <button class="example-card" id="try-example" type="button" disabled><span class="example-icon" aria-hidden="true">↗</span><span><strong>Неделя в Ереване</strong><span>Один взрослый · до 80 000 ₽ · завтрак и багаж</span></span><span class="example-arrow" aria-hidden="true">→</span></button>
+              <p class="example-hint">Попробуйте этот пример — для него уже есть данные</p>
+            </div>
+            <div id="messages" class="messages" role="log" aria-live="polite" aria-label="Переписка с помощником"></div>
+            <div id="progress" class="progress" role="status" hidden><span class="thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="progress-text">Понимаю ваш запрос…</span></div>
+          </div>
+          <div class="composer-area">
+            <button id="view-options" class="jump-results" type="button" hidden>Посмотреть варианты ↓</button>
+            <div id="voice-status" class="voice-status" hidden>
+              <span class="voice-status-dot" aria-hidden="true"></span><span id="voice-status-text" class="voice-status-text" role="status" aria-live="polite"></span><span id="voice-timer" class="voice-timer" aria-hidden="true" hidden>0:00</span><button id="voice-cancel" class="voice-cancel" type="button" hidden>Отмена</button>
+            </div>
+            <form id="chat-form" class="composer">
+              <label class="sr-only" for="message-input">Сообщение агенту</label>
+              <textarea id="message-input" rows="2" maxlength="12000" placeholder="Например: хочу на неделю в Ереван, с завтраком…" disabled></textarea>
+              <button id="voice-button" class="voice-button" type="button" aria-label="Записать голосовое сообщение" aria-describedby="voice-hint" aria-pressed="false" disabled><svg id="voice-mic-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="3" width="7" height="12" rx="3.5"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-3 0h6"/></svg><svg id="voice-stop-icon" viewBox="0 0 24 24" aria-hidden="true" hidden><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+              <button id="send-button" type="submit" class="send-button" aria-label="Отправить сообщение" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button>
+            </form>
+            <p id="voice-hint" class="voice-hint">Проверяем доступность голосового ввода…</p>
+            <div class="read-aloud"><label><input id="read-aloud-toggle" type="checkbox" aria-describedby="read-aloud-note" disabled> Озвучивать ответы</label><span id="read-aloud-note">Проверяем локальный голос…</span></div>
+            <div class="composer-caption"><span>Enter — отправить <span class="dot-separator">·</span> Shift + Enter — новая строка</span><span id="model-label">Codex</span></div>
+          </div>
+        </section>
+
+        <aside class="trip-column" aria-label="Варианты и план поездки">
+          <div class="trip-heading"><h2 id="trip-title">Ваша поездка</h2><span id="trip-count" class="count-badge" hidden></span><span id="saved-note" class="saved-note" hidden>Сохранено на этом компьютере</span></div>
+          <div id="trip-content">
+            <section class="empty-trip panel">
+              <div class="route-art" aria-hidden="true">
+                <svg viewBox="0 0 520 240"><defs><pattern id="map-grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#cadbd2" stroke-width=".65"/></pattern></defs><rect width="520" height="240" fill="url(#map-grid)"/><path d="M-10 150 110 60 205 130 340 25 540 115" fill="none" stroke="#f9fcf8" stroke-width="35"/><path d="M-10 150 110 60 205 130 340 25 540 115" fill="none" stroke="#c5d8cb" stroke-width="2"/><path d="M125 165C205 15 300 220 395 77" fill="none" stroke="#3b7b6e" stroke-width="2.5" stroke-dasharray="6 6"/><circle cx="125" cy="165" r="9" fill="#fff" stroke="#164d48" stroke-width="3"/><circle cx="395" cy="77" r="18" fill="#164d48"/><path d="m389 77 4 4 8-9" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(252 120) rotate(16)"><circle r="23" fill="#fdfaf3"/><path d="m-13 1 26-8-9 21-4-10z" fill="#e99055"/></g></svg>
+                <span class="map-label label-start">Москва</span><span class="map-label label-end">Ереван</span><span class="map-caption">ВАШЕ СЛЕДУЮЩЕЕ ПУТЕШЕСТВИЕ</span>
+              </div>
+              <div class="empty-copy"><span class="small-label">Всё важное — в одном месте</span><h3>От первого «хочу»<br>до готового плана</h3><p>Здесь появятся варианты дороги и проживания с отдельными ценами. Вы сможете выбрать перелёт или поезд и подходящий отель.</p><div class="feature-row"><span><span aria-hidden="true">↔</span> Транспорт</span><span><span aria-hidden="true">⌂</span> Отель</span><span><span aria-hidden="true">✓</span> Проверка условий</span></div></div>
+            </section>
+          </div>
+          <div class="test-note" id="test-note"><span class="note-icon" aria-hidden="true">i</span><p><strong>Пространство для проверки</strong><span>Доступен пример Москва — Ереван, 24 ноября — 1 декабря 2026, один взрослый. Цены из архива Туту от 26.10.2026. Бронирование и оплата имитируются.</span></p></div>
+          <section class="search-connection" aria-labelledby="search-connection-title">
+            <div class="search-connection-heading"><span class="yandex-mark" aria-hidden="true">Я</span><div><h3 id="search-connection-title">Поиск в интернете</h3><p id="search-connection-status" role="status">Яндекс не настроен</p></div><button id="search-settings-toggle" class="button button-quiet button-small" type="button" aria-controls="search-settings" aria-expanded="false" disabled>Подключить Яндекс</button></div>
+            <form id="search-settings" class="search-settings" hidden autocomplete="off">
+              <p class="search-settings-intro">Подключите Search API из Yandex Cloud, чтобы искать афиши и другие сведения в интернете.</p>
+              <label for="search-api-key">Ключ API</label><input id="search-api-key" name="api_key" type="password" required maxlength="4096" autocomplete="off" spellcheck="false" aria-describedby="search-key-help search-setup-note">
+              <p id="search-key-help" class="search-setup-note">Вставьте секретное значение API-ключа, а не его ID.</p>
+              <label for="search-folder-id">ID каталога</label><input id="search-folder-id" name="folder_id" type="text" required maxlength="50" autocomplete="off" spellcheck="false" aria-describedby="search-folder-help">
+              <p id="search-folder-help" class="search-setup-note">Нужен ID каталога Yandex Cloud, к которому у сервисного аккаунта есть доступ.</p>
+              <details class="search-setup-note"><summary>Если Яндекс отклоняет доступ</summary><p>У сервисного аккаунта должна быть роль <code>search-api.webSearch.user</code> в этом каталоге, у ключа — область действия <code>yc.search-api.execute</code>.</p><a href="https://aistudio.yandex.ru/ru/docs/search-api/operations/web-search-sync" target="_blank" rel="noopener noreferrer">Инструкция Яндекса</a></details>
+              <p id="search-setup-note" class="search-setup-note">Настройки действуют до перезапуска приложения. Ключ не попадёт в чат и не сохраняется в браузере.</p>
+              <p id="search-config-error" class="search-config-error" role="alert" hidden></p>
+              <div class="button-group"><button id="search-config-submit" class="button button-small" type="submit">Подключить</button><button id="search-config-cancel" class="button button-secondary button-small" type="button">Отмена</button></div>
+            </form>
+            <button id="search-repeat" class="button button-secondary button-small search-repeat" type="button" hidden>Повторить поиск</button>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <footer><span>О!дин запрос</span><span>Планируем внимательно. Путешествуем легко.</span></footer>
+  </div>
+</body>
+</html>
